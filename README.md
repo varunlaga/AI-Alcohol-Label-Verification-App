@@ -19,19 +19,13 @@ Link:
   - Net Contents Verification (Volume pattern matching (e.g., "750 $\text{mL}$", "12 fl oz"))
   - Government Warning Detection ($\text{Bonus}$ feature to check for mandatory health warning keywords)
 - Clear Results: Field-by-field verification status with detailed feedback on match/mismatch/warning
-- Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches.
+- Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches
 
 ## Tech Stack
 
-### Backend
+    | Component        | Technology     | Version/Tool  |
+    |:-----------------|:--------------:|--------------:|
+    | Backend Framework| Flask          | Flask 3.0.0   |
+    | Item 2       | Description 2  | $25.50        |
 
-- Framework: Flask 3.0.0
-- OCR Engine: Tesseract OCR via pytesseract
-- Image Processing: Python Image Family (PIL)
-- Language: Python 3.11
 
-### Frontend
-
-- HTML5
-- CSS3
-- Vanilla JavaScript
