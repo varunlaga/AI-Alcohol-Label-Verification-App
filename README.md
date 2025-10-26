@@ -1,6 +1,6 @@
 # AI-Alcohol-Label-Verification-App
 
-About: This is an AI-powered alcohol label verification app for Alcohol and Tobacco Tax and Trade Bureau (TTB) compliance checking.
+About: This is an AI-powered full-stack web application designed to simulate the Alcohol and Tobacco Tax and Trade Bureau ($\text{TTB}$) label approval process. It verifies that the information submitted in a simplified $\text{TTB}$ application form (Brand Name, $\text{ABV}$, etc.) accurately matches the text content extracted from the uploaded alcohol beverage label image.The application uses Tesseract OCR for text extraction and implements smart verification algorithms using fuzzy string matching and regular expressions to determine compliance status for each field.
 
 # Live
 
