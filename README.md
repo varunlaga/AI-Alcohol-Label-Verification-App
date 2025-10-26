@@ -1,24 +1,25 @@
 # AI-Alcohol-Label-Verification-App
 
-About: This is an AI-powered full-stack web application designed to simulate the Alcohol and Tobacco Tax and Trade Bureau ($\text{TTB}$) label approval process. It verifies that the information submitted in a simplified $\text{TTB}$ application form (Brand Name, $\text{ABV}$, etc.) accurately matches the text content extracted from the uploaded alcohol beverage label image.The application uses Tesseract OCR for text extraction and implements smart verification algorithms using fuzzy string matching and regular expressions to determine compliance status for each field.
+About: This is an AI-powered full-stack web application designed to simulate the Alcohol and Tobacco Tax and Trade Bureau ($\text{TTB}$) label approval process. It verifies that the information submitted in a simplified $\text{TTB}$ application form (Brand Name, $\text{ABV}$, and etc.) accurately matches the text content extracted from the uploaded alcohol beverage label image.The application uses Tesseract OCR for text extraction and implements verification algorithms using fuzzy string matching and regular expressions to determine compliance status for each field.
 
-# Live
+# Live Application
 
+Link: 
 
-# Features
+# Key Features
 
-- Form Input: Simplified TTB application form with key fields
-- Image Upload: Support for JPEG/PNG with drag-and-drop
+- Form Input: Simplified TTB application form with mandatory and optional key fields
+- Image Upload: Support for JPEG/PNG with a user-friendly drag and drop interface
 - OCR Processing: Tesseract-based text extraction from label images
-- Smart Verification: Fuzzy matching with text normalization
-- Comprehensive Checks:
-  - Brand Name verification (85% similarity threshold)
-  - Product Class/Type verification (75% similarity threshold)
-  - Alcohol Content verification (multiple pattern recognition)
-  - Net Contents verification (volume pattern matching)
-  - Government Warning detection (bonus feature)
-- Clear Results: Field-by-field verification with detailed feedback
-- Error Handling: Error handling of OCR failures and mismatches
+- Different Verifications: Fuzzy matching with text normalization (normalize_text function) to account for slight $\text{OCR}$ errors and formatting differences
+- Comprehensive Verification Checks:
+  - Brand Name Verification (85% similarity threshold for fuzzy matching)
+  - Product Class/Type Verification (75% similarity threshold for fuzzy matching)
+  - Alcohol Content Verification (Multiple pattern recognition (e.g., "$\text{45\%}$ $\text{Alc.}$/Vol.", "90 Proof") and numerical comparison)
+  - Net Contents Verification (Volume pattern matching (e.g., "750 $\text{mL}$", "12 fl oz"))
+  - Government Warning Detection ($\text{Bonus}$ feature to check for mandatory health warning keywords)
+- Clear Results: Field-by-field verification status with detailed feedback on match/mismatch/warning
+- Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches.
 
 ## Tech Stack
 
