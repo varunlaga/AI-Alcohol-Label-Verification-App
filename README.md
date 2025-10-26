@@ -7,7 +7,7 @@ About: This is an AI-powered alcohol label verification app for Alcohol and Toba
 
 # Features
 
-**Form Input:** Simplified TTB application form with key fields
+- Form Input: Simplified TTB application form with key fields
 - Image Upload: Support for JPEG/PNG with drag-and-drop
 - OCR Processing: Tesseract-based text extraction from label images
 - Smart Verification: Fuzzy matching with text normalization
