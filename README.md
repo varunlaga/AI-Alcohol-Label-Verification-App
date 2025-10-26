@@ -23,9 +23,12 @@ Link:
 
 ## Tech Stack
 
-    | Component        | Technology     | Version/Tool  |
-    |:-----------------|:--------------:|--------------:|
-    | Backend Framework| Flask          | Flask 3.0.0   |
-    | Item 2       | Description 2  | $25.50        |
+    | Component        | Technology     | Version/Tool                    |
+    |------------------|----------------|---------------------------------|
+    | Backend Framework| Flask          | Flask 3.0.0                     |
+    | OCR Engine       | Tesseract OCR  | pytesseract lib                 |
+    | Image Processing | PIL            | Pillow                          |
+    | Language         | Python         | Python 3.11.0                   |
+    | Frontend         | HTML, CSS, JS  | HTML5, CSS3, Vanilla JavaScript | 
 
 
