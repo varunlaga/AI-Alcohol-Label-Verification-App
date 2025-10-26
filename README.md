@@ -31,4 +31,30 @@ Link:
     | Language         | Python         | Python 3.11.0                   |
     | Frontend         | HTML, CSS, JS  | HTML5, CSS3, Vanilla JavaScript | 
 
+## How to Run Locally
+
+
+
+
+
+
+
+## Configuration and Environment Variables
+
+
+
+
+
+
+
+## Design & Approach Documentation
+
+OCR Tool Selection
+
+
+
+
+
+
+
 
