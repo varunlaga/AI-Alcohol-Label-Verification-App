@@ -1,0 +1,39 @@
+# ------------------------------------
+# Virtual Environment & Python Files
+# ------------------------------------
+
+# Ignore the specific virtual environment folder
+my_venv/
+
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+
+# ------------------------------------
+# Sensitive Data & Configuration
+# ------------------------------------
+# Ignore files containing API keys or secrets
+.env
+config.py
+settings.py
+
+# ------------------------------------
+# User Uploads and Temporary Files
+# ------------------------------------
+# Ignore the folder where user label images are uploaded
+backend/uploads/
+
+# Log files
+*.log
+
+# ------------------------------------
+# OS & IDE Generated Files
+# ------------------------------------
+# Operating System
+Thumbs.db # Windows
+
+# IDEs (Visual Studio Code, PyCharm, etc.)
+.vscode/
+.idea/
