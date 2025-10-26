@@ -1,6 +1,6 @@
 # AI-Alcohol-Label-Verification-App
 
-About: AI-powered alcohol label verification app for Alcohol and Tobacco Tax and Trade Bureau (TTB) compliance checking
+About: This is an AI-powered alcohol label verification app for Alcohol and Tobacco Tax and Trade Bureau (TTB) compliance checking.
 
 # Live
 
