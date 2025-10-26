@@ -17,3 +17,20 @@ About: This is an AI-powered alcohol label verification app for Alcohol and Toba
   - Alcohol Content verification (multiple pattern recognition)
   - Net Contents verification (volume pattern matching)
   - Government Warning detection (bonus feature)
+- Clear Results: Field-by-field verification with detailed feedback
+- Error Handling: Error handling of OCR failures and mismatches
+
+## Tech Stack
+
+### Backend
+
+- Framework: Flask 3.0.0
+- OCR Engine: Tesseract OCR via pytesseract
+- Image Processing: Python Image Family (PIL)
+- Language: Python 3.11
+
+### Frontend
+
+- HTML5
+- CSS3
+- Vanilla JavaScript
