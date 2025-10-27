@@ -17,7 +17,7 @@ Link:
   - Product Class/Type Verification (75% similarity threshold for fuzzy matching)
   - Alcohol Content Verification (Multiple pattern recognition (e.g., 45% $\text{Alc.}$/Vol.") and numerical comparison)
   - Net Contents Verification (Volume pattern matching (e.g., "750 $\text{mL}$", "12 fl oz"))
-  - Government Warning Detection ($\text{Bonus}$ feature to check for mandatory health warning keywords)
+  - Government Warning Detection (Bonus feature to check for mandatory health warning keywords)
 - Clear Results: Field-by-field verification status with detailed feedback on match/mismatch/warning
 - Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches
 
