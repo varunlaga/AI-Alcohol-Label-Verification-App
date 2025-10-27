@@ -7,8 +7,8 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 import logging
-from .utils.ocr_processor import extract_text_from_image, test_tesseract_installation
-from .utils.verification import verify_label_data
+from utils.ocr_processor import extract_text_from_image, test_tesseract_installation
+from utils.verification import verify_label_data
 from dotenv import load_dotenv
 from os import environ
 
@@ -42,84 +42,240 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
+    """
+    Check if the uploaded file has an allowed extension
+    
+    Args:
+        filename: Name of the uploaded file
+        
+    Returns:
+        bool: True if file extension is allowed
+    """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
 @app.route('/')
 def index():
-    # Assuming index.html is in ../frontend/templates
+    """
+    Render the main application page
+    
+    Returns:
+        Rendered HTML template
+    """
+    logger.info("Rendering index page")
     return render_template('index.html')
 
-@app.route('/api/health')
-def health_check():
-    return jsonify({"status": "ok", "message": "API is running."})
 
 @app.route('/api/verify', methods=['POST'])
-def verify():
-    # 1. Input Validation (File and Form Data)
-    if 'image' not in request.files:
-        return jsonify({"success": False, "message": "No image file provided."}), 400
+def verify_label():
+    """
+    API endpoint to verify alcohol label against form data
     
-    file = request.files['image']
-    form_data = request.form.to_dict()
-
-    if file.filename == '' or not allowed_file(file.filename):
-        return jsonify({"success": False, "message": "Invalid or missing file."}), 400
-
-    # 2. Save Image (Required for disk-based OCR access)
-    filename = secure_filename(file.filename)
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(image_path)
-    logger.info(f"Image saved to: {image_path}")
-
+    Accepts:
+        - Form data: brandName, productType, alcoholContent, netContents
+        - File: labelImage
+        
+    Returns:
+        JSON response with verification results
+    """
     try:
-        # 3. OCR Extraction (Now uses Cloud API via ocr_processor.py)
-        # Note: ocr_processor.py should be updated to use requests and a cloud API
-        extracted_text = extract_text_from_image(image_path)
+        logger.info("=" * 60)
+        logger.info("Received label verification request")
         
-        # Handle OCR errors passed back as strings
-        if extracted_text.startswith("ERROR:") or extracted_text.startswith("No readable text"):
+        # Validate image file presence
+        if 'labelImage' not in request.files:
+            logger.warning("No image file in request")
             return jsonify({
-                "success": False,
-                "message": "OCR Failed or no text found.",
-                "details": [
-                    {
-                        "field": "OCR Status",
-                        "form_value": "N/A",
-                        "label_value": extracted_text,
-                        "status": "ERROR",
-                        "message": extracted_text
-                    }
-                ]
-            }), 200 # Return 200 but indicate failure internally
-
-        # 4. Verification
-        results = verify_label_data(form_data, extracted_text)
+                'error': 'No image file uploaded. Please select a label image.'
+            }), 400
         
-        # 5. Determine Overall Status
-        overall_status = all(r['status'] == 'MATCH' for r in results)
-        overall_message = "SUCCESS: All required label information matches the application form." if overall_status else "FAILURE: Discrepancies found between the label and the application form."
+        file = request.files['labelImage']
         
-        return jsonify({
-            "success": overall_status,
-            "message": overall_message,
-            "details": results
-        }), 200
-
-    except Exception as e:
-        logger.error(f"Verification processing failed: {e}")
-        return jsonify({"success": False, "message": f"Server processing error: {e}"}), 500
+        # Validate file selection
+        if file.filename == '':
+            logger.warning("Empty filename")
+            return jsonify({
+                'error': 'No file selected. Please choose an image file.'
+            }), 400
+        
+        # Validate file type
+        if not allowed_file(file.filename):
+            logger.warning(f"Invalid file type: {file.filename}")
+            return jsonify({
+                'error': 'Invalid file type. Please upload a PNG or JPEG image.'
+            }), 400
+        
+        # Extract form data
+        form_data = {
+            'brand_name': request.form.get('brandName', '').strip(),
+            'product_type': request.form.get('productType', '').strip(),
+            'alcohol_content': request.form.get('alcoholContent', '').strip(),
+            'net_contents': request.form.get('netContents', '').strip()
+        }
+        
+        logger.info(f"Form data received:")
+        logger.info(f"  - Brand Name: {form_data['brand_name']}")
+        logger.info(f"  - Product Type: {form_data['product_type']}")
+        logger.info(f"  - Alcohol Content: {form_data['alcohol_content']}%")
+        logger.info(f"  - Net Contents: {form_data['net_contents'] or 'Not provided'}")
+        
+        # Validate required fields
+        if not form_data['brand_name']:
+            return jsonify({
+                'error': 'Brand name is required'
+            }), 400
+        
+        if not form_data['product_type']:
+            return jsonify({
+                'error': 'Product class/type is required'
+            }), 400
+        
+        if not form_data['alcohol_content']:
+            return jsonify({
+                'error': 'Alcohol content is required'
+            }), 400
+        
+        # Validate alcohol content is a valid number
+        try:
+            abv = float(form_data['alcohol_content'])
+            if abv < 0 or abv > 100:
+                return jsonify({
+                    'error': 'Alcohol content must be between 0 and 100'
+                }), 400
+        except ValueError:
+            return jsonify({
+                'error': 'Alcohol content must be a valid number'
+            }), 400
+        
+        # Save uploaded file temporarily
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        logger.info(f"File saved temporarily: {filepath}")
+        
+        try:
+            # Extract text from image using OCR (Tesseract)
+            logger.info("Starting OCR text extraction...")
+            extracted_text = extract_text_from_image(filepath)
+            
+            logger.info(f"OCR extraction completed: {len(extracted_text)} characters")
+            logger.debug(f"Extracted text preview:\n{extracted_text[:300]}...")
+            
+            # Check if sufficient text was extracted
+            if not extracted_text or len(extracted_text.strip()) < 500:
+                logger.warning("Insufficient text extracted from image")
+                return jsonify({
+                    'error': 'Could not read sufficient text from the label image. '
+                            'Please ensure the image is clear, well-lit, and contains readable text. '
+                            'Try taking a higher quality photo or using a clearer image.'
+                }), 400
+            
+            # Verify label data against form inputs
+            logger.info("Starting label verification...")
+            verification_results = verify_label_data(form_data, extracted_text)
+            
+            # Log results summary
+            match_count = sum(1 for v in verification_results if v['status'] == 'match')
+            total_count = len(verification_results)
+            logger.info(f"Verification completed: {match_count}/{total_count} checks passed")
+            
+            for result in verification_results:
+                logger.info(f"  - {result['field']}: {result['status']}")
+            
+            # Return results
+            response = {
+                'success': True,
+                'verifications': verification_results,
+                'extracted_text': extracted_text[:1000]  # Limit to first 1000 chars
+            }
+            
+            logger.info("Request processed successfully")
+            logger.info("=" * 60)
+            
+            return jsonify(response), 200
+        
+        finally:
+            # Clean up temporary file
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                logger.info(f"Cleaned up temporary file: {filepath}")
     
-    finally:
-        # 6. Clean up the uploaded image file
-        if os.path.exists(image_path):
-            os.remove(image_path)
-            logger.info(f"Cleaned up image file: {image_path}")
+    except Exception as e:
+        logger.error(f"Error processing request: {str(e)}", exc_info=True)
+        return jsonify({
+            'error': f'An unexpected error occurred while processing your request. '
+                    f'Please try again or contact support if the problem persists. '
+                    f'Error details: {str(e)}'
+        }), 500
+
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """
+    Health check endpoint to verify server and Tesseract status
+    
+    Returns:
+        JSON response with server status
+    """
+    tesseract_ok = test_tesseract_installation()
+    
+    return jsonify({
+        'status': 'healthy' if tesseract_ok else 'degraded',
+        'tesseract_installed': tesseract_ok,
+        'message': 'Server is running' if tesseract_ok else 'Tesseract OCR not found'
+    }), 200 if tesseract_ok else 503
+
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    """Handle file size exceeded error"""
+    logger.warning("File size exceeded 16MB limit")
+    return jsonify({
+        'error': 'File is too large. Maximum size is 16MB. '
+                'Please compress your image or use a smaller file.'
+    }), 413
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Handle 404 errors"""
+    return jsonify({
+        'error': 'Endpoint not found'
+    }), 404
+
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle 500 errors"""
+    logger.error(f"Internal server error: {str(error)}")
+    return jsonify({
+        'error': 'Internal server error. Please try again later.'
+    }), 500
 
 
 def startup_checks():
+    """
+    Perform startup checks to ensure system is ready
+    """
     logger.info("=" * 60)
-    logger.info("Starting server startup checks...")
+    logger.info("TTB Label Verification App - Startup")
+    logger.info("=" * 60)
+    
+    # Check Tesseract installation
+    logger.info("Checking Tesseract OCR installation...")
+    if test_tesseract_installation():
+        logger.info("✓ Tesseract OCR is properly installed and working")
+    else:
+        logger.error("✗ Tesseract OCR is not installed or not accessible")
+        logger.error("Please install Tesseract from:")
+        logger.error("  Windows: https://github.com/UB-Mannheim/tesseract/wiki")
+        logger.error("  macOS: brew install tesseract")
+        logger.error("  Linux: sudo apt-get install tesseract-ocr")
+        logger.error("")
+        logger.error("After installation, if Tesseract is not in PATH:")
+        logger.error("  Edit backend/utils/ocr_processor.py and uncomment:")
+        logger.error("  pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
     
     # Check upload directory
     if os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -145,5 +301,11 @@ if __name__ == '__main__':
     # Determine if running in production
     is_production = os.environ.get('FLASK_ENV') == 'production'
     
-    # Run the app
-    app.run(host='0.0.0.0', port=port, debug=not is_production)
+    logger.info(f"Starting Flask server on port {port}...")
+    logger.info(f"Environment: {'Production' if is_production else 'Development'}")
+    
+    app.run(
+        debug=not is_production,  # Debug off in production
+        host='0.0.0.0',
+        port=port
+    )
