@@ -78,6 +78,11 @@ def contains_text(haystack, needle, fuzzy=True, threshold=0.8):
     haystack_norm = normalize_text(haystack)
     needle_norm = normalize_text(needle)
     
+    # Reject empty or too-short normalized text
+    if not needle_norm or len(needle_norm) < 2:
+        logger.warning(f"Rejected: '{needle}' too short or contains no valid characters")
+        return False
+    
     # Exact substring match
     if needle_norm in haystack_norm:
         logger.debug(f"Exact match found: '{needle}' in text")
@@ -91,6 +96,10 @@ def contains_text(haystack, needle, fuzzy=True, threshold=0.8):
         # Try matching with consecutive word combinations
         needle_words = needle_norm.split()
         needle_len = len(needle_words)
+        
+        # Prevent empty needle_words
+        if needle_len == 0:
+            return False
         
         for i in range(len(words) - needle_len + 1):
             phrase = ' '.join(words[i:i + needle_len])
@@ -114,7 +123,25 @@ def verify_brand_name(form_brand, extracted_text):
     """
     logger.info(f"Verifying brand name: {form_brand}")
     
-    if contains_text(extracted_text, form_brand, fuzzy=True, threshold=0.85):
+    # Validate input length
+    if len(form_brand.strip()) < 2:
+        return {
+            'field': 'Brand Name',
+            'status': 'mismatch',
+            'message': f"✗ Brand name must be at least 2 characters long."
+        }
+    
+    # Check normalized text isn't empty
+    normalized = normalize_text(form_brand)
+    if not normalized or len(normalized) < 2:
+        return {
+            'field': 'Brand Name',
+            'status': 'mismatch',
+            'message': f"✗ Brand name '{form_brand}' contains no valid characters."
+        }
+    
+    # IMPROVEMENT: Use stricter 90% threshold instead of 85%
+    if contains_text(extracted_text, form_brand, fuzzy=True, threshold=0.90):
         return {
             'field': 'Brand Name',
             'status': 'match',
@@ -141,8 +168,25 @@ def verify_product_type(form_type, extracted_text):
     """
     logger.info(f"Verifying product type: {form_type}")
     
-    # Product types can be long phrases, so use slightly lower threshold
-    if contains_text(extracted_text, form_type, fuzzy=True, threshold=0.75):
+    # Validate input length
+    if len(form_type.strip()) < 3:
+        return {
+            'field': 'Product Class/Type',
+            'status': 'mismatch',
+            'message': f"✗ Product type must be at least 3 characters long."
+        }
+    
+    # Check normalized text isn't empty
+    normalized = normalize_text(form_type)
+    if not normalized or len(normalized) < 3:
+        return {
+            'field': 'Product Class/Type',
+            'status': 'mismatch',
+            'message': f"✗ Product type '{form_type}' contains no valid characters."
+        }
+    
+    # IMPROVEMENT: Use stricter 80% threshold instead of 75%
+    if contains_text(extracted_text, form_type, fuzzy=True, threshold=0.80):
         return {
             'field': 'Product Class/Type',
             'status': 'match',
@@ -166,7 +210,6 @@ def verify_product_type(form_type, extracted_text):
             'status': 'mismatch',
             'message': f"✗ Product type '{form_type}' not found on the label."
         }
-
 
 def verify_alcohol_content(form_abv, extracted_text):
     """
@@ -261,7 +304,7 @@ def verify_net_contents(form_contents, extracted_text):
     
     logger.info(f"Verifying net contents: {form_contents}")
     
-    # Normalize the form contents (e.g., "750ml", "750 ml", "750 mL" should all match)
+    # Normalize the form contents (like "750ml", "750 ml", "750 mL" should all match)
     form_normalized = normalize_text(form_contents)
     
     # Extract volume patterns from text

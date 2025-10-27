@@ -125,6 +125,12 @@ def verify_label():
             return jsonify({
                 'error': 'Brand name is required'
             }), 400
+
+        # Add length validation
+        if len(form_data['brand_name']) < 2:
+            return jsonify({
+                'error': 'Brand name must be at least 2 characters long'
+            }), 400
         
         if not form_data['product_type']:
             return jsonify({

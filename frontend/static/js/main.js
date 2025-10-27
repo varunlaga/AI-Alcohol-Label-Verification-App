@@ -183,16 +183,29 @@ function validateForm() {
     const productType = document.getElementById('productType').value.trim();
     const alcoholContent = document.getElementById('alcoholContent').value.trim();
     
+    // Brand name length validation
     if (!brandName) {
         alert('Please enter the brand name');
         return false;
     }
     
+    if (brandName.length < 2) {
+        alert('Brand name must be at least 2 characters long');
+        return false;
+    }
+    
+    // Product type length validation
     if (!productType) {
         alert('Please enter the product class/type');
         return false;
     }
     
+    if (productType.length < 3) {
+        alert('Product class/type must be at least 3 characters long');
+        return false;
+    }
+    
+    // Alcohol content validation
     if (!alcoholContent) {
         alert('Please enter the alcohol content');
         return false;
@@ -204,6 +217,7 @@ function validateForm() {
         return false;
     }
     
+    // Image validation
     if (!fileInput.files || fileInput.files.length === 0) {
         alert('Please upload a label image');
         return false;
