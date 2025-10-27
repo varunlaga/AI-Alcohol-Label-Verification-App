@@ -185,3 +185,4 @@ if __name__ == "__main__":
         print("✗ Tesseract installation test failed")
         print("Please install Tesseract OCR from:")
         print("https://github.com/UB-Mannheim/tesseract/wiki")
+
