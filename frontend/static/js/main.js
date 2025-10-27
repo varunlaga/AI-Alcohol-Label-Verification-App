@@ -120,6 +120,8 @@ const submitButton = document.getElementById('submitButton');
 const loadingIndicator = document.getElementById('loadingIndicator');
 const resultsSection = document.getElementById('resultsSection');
 const resultsContent = document.getElementById('resultsContent');
+const formSection = document.querySelector('.form-section');
+const labelVerificationForm = document.getElementById('labelVerificationForm');
 
 form.addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -360,19 +362,38 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Reset Form 
-function resetForm() {
-    // Remove image
-    removeImage();
-    
-    // Hide results
+// Edit form or try new image
+function editForm() {
+    // Hide results and show form
     resultsSection.classList.add('hidden');
-    
-    // Scroll to top
+    formSection.classList.remove('hidden');
+
+    // Scroll to the top of the form
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
     });
+    
+    // Optional - hide error messages if they were visible
+    if (typeof hideMessage === 'function') {
+        hideMessage(); 
+    }
+}
+
+// Reset Form 
+function resetForm() {
+    // Clear all text inputs
+    if (labelVerificationForm) {
+        labelVerificationForm.reset();
+    }
+    
+    // Removes image
+    if (typeof removeImage === 'function') {
+        removeImage(); 
+    }
+    
+    // 3. Switch views and scroll to top
+    editForm();
 }
 
 // Inject additional styles for results display
