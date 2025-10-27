@@ -23,7 +23,13 @@ Link:
 
 ## Tech Stack
 
-    <img width="1037" height="358" alt="image" src="https://github.com/user-attachments/assets/7eca3e6d-d2ee-4ef8-a71c-1f43f7068fd3" />
+|                  Component                 |          Technology          |           Version/Tool          |   
+|--------------------------------------------|------------------------------|---------------------------------|
+|              Backend Framework             |             Flask            |              3.0.0              |
+| OCR (Optical Character Recognition) Engine |         Tesseract OCR        |       pytesseract library       |
+|              Image Processing              | PIL (Python Imaging Library) |              Pillow             |
+|                  Language                  |            Python            |              3.11.0             |
+|             Frontend Framework             |         HTML, CSS, JS        | HTML5, CSS3, Vanilla JavaScript |
 
 
 ## How to Run Locally
