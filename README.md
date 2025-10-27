@@ -47,30 +47,30 @@ Must have installed:
 
 #### Clone the repository
 
-git clone https://github.com/varunlaga/AI-Alcohol-Label-Verification-App.git
-cd AI-Alcohol-Label-Verification-App
+- git clone https://github.com/varunlaga/AI-Alcohol-Label-Verification-App.git
+- cd AI-Alcohol-Label-Verification-App
 
 #### Create and activate a Python virtual environment
 
-python -m venv my_venv
-source my_env/Scripts/activate
+- python -m venv my_venv
+- source my_env/Scripts/activate
 
 #### Installation
 
 Install the required Python dependencies
 
-pip install -r requirements.txt
+- pip install -r requirements.txt
 
 #### Run the Application
 
 Set environment variables (optional but recommended)
 
-export FLASK_ENV=development
-export FLASK_APP=backend/app.py
+- export FLASK_ENV=development
+- export FLASK_APP=backend/app.py
 
 Start the Flask server
 
-python backend/app.py
+- python backend/app.py
 
 The application should now be running and accessible in the web browser: http://localhost:5000
 
