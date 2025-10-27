@@ -392,7 +392,7 @@ function resetForm() {
         removeImage(); 
     }
     
-    // 3. Switch views and scroll to top
+    // Switch views and scroll to top
     editForm();
 }
 
