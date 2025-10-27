@@ -15,8 +15,8 @@ Link:
 - Comprehensive Verification Checks:
   - Brand Name Verification (85% similarity threshold for fuzzy matching)
   - Product Class/Type Verification (75% similarity threshold for fuzzy matching)
-  - Alcohol Content Verification (Multiple pattern recognition (e.g., 45% $\text{Alc.}$/Vol.") and numerical comparison)
-  - Net Contents Verification (Volume pattern matching (e.g., "750 $\text{mL}$", "12 fl oz"))
+  - Alcohol Content Verification (Multiple pattern recognition (like 45% $\text{Alc.}$/Vol.") and numerical comparison)
+  - Net Contents Verification (Volume pattern matching (like "750 $\text{mL}$", "12 fl oz"))
   - Government Warning Detection (Bonus feature to check for mandatory health warning keywords)
 - Clear Results: Field-by-field verification status with detailed feedback on match/mismatch/warning
 - Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches
@@ -62,7 +62,7 @@ The core function for successful verification is normalize_text in verification.
 
 Approach: All text (both form input and OCR output) is converted to lowercase and stripped of most special characters (except $\text{.}$ / $\text{-}$ / %) to create a clean, comparable string.
 
-Purpose: This mitigates the common issue of OCR introducing small errors (e.g., misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not overly strict formatting.
+Purpose: This mitigates the common issue of OCR introducing small errors (like misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not overly strict formatting.
 
 ### Key Assumptions and Limitations
 
