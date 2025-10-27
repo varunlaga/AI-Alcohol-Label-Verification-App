@@ -14,10 +14,8 @@ __pycache__/
 # ------------------------------------
 # Sensitive Data & Configuration
 # ------------------------------------
-# Ignore files containing API keys or secrets
+# Ignore file containing API keys or secrets
 .env
-config.py
-settings.py
 
 # ------------------------------------
 # User Uploads and Temporary Files
