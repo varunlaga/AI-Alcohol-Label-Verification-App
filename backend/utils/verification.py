@@ -261,7 +261,7 @@ def verify_net_contents(form_contents, extracted_text):
     
     logger.info(f"Verifying net contents: {form_contents}")
     
-    # Normalize the form contents (e.g., "750ml", "750 ml", "750 mL" should all match)
+    # Normalize the form contents (like "750ml", "750 ml", "750 mL" should all match)
     form_normalized = normalize_text(form_contents)
     
     # Extract volume patterns from text
