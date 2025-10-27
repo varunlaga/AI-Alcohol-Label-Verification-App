@@ -71,7 +71,7 @@ Purpose: This mitigates the common issue of OCR introducing small errors (like m
 |    Image Quality   |                   Assumes the uploaded label image is clear, well-lit, and not heavily distorted or rotated                  |                  Poor quality images will severely degrade OCR accuracy and lead to "mismatch" results                 |   |   |
 |      Language      |    Assumes only English text and Tesseract uses English as default so it must be configured for other languages if needed    |                         Non-English characters or complex scripts may not be reliably extracted                        |   |   |
 | Verification Logic | Assumes verification is based purely on the presence of text so does not verify the location or context of the text on label | The system can not determine if a mandatory statement is in the required font size or location only if the text exists |   |   |
-|  ABV/Net Contents  |   Assumes verification relies on successful extraction of specific numerical patterns like 45% or unit formats like 750 mL   |        Unusual typography on the label may prevent the regex from matching the content even if OCR extracts text       |   |   |
+|  ABV/Net Contents  |   Assumes verification relies on successful extraction of specific numerical patterns like 45% or unit formats like 750 mL   |        Unusual typography on the label may prevent the regex from matching the content even if OCR extracts text       |   
 
 
 
