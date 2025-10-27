@@ -7,9 +7,8 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 import logging
-# We keep the import, but ocr_processor.py will now use the cloud API
-from utils.ocr_processor import extract_text_from_image, test_tesseract_installation
-from utils.verification import verify_label_data
+from .utils.ocr_processor import extract_text_from_image, test_tesseract_installation
+from .utils.verification import verify_label_data
 from dotenv import load_dotenv
 from os import environ
 
@@ -48,6 +47,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
+    # Assuming index.html is in ../frontend/templates
     return render_template('index.html')
 
 @app.route('/api/health')
@@ -74,6 +74,7 @@ def verify():
 
     try:
         # 3. OCR Extraction (Now uses Cloud API via ocr_processor.py)
+        # Note: ocr_processor.py should be updated to use requests and a cloud API
         extracted_text = extract_text_from_image(image_path)
         
         # Handle OCR errors passed back as strings
@@ -115,16 +116,10 @@ def verify():
             os.remove(image_path)
             logger.info(f"Cleaned up image file: {image_path}")
 
+
 def startup_checks():
     logger.info("=" * 60)
     logger.info("Starting server startup checks...")
-    
-    # ----------------------------------------------------
-    # KEY CHANGE: REMOVE TESSERACT CHECK
-    # This block is removed because the Tesseract system binary 
-    # cannot be installed on PythonAnywhere's free tier.
-    # The OCR logic is now handled by the Cloud API in ocr_processor.py.
-    # ----------------------------------------------------
     
     # Check upload directory
     if os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -144,7 +139,7 @@ if __name__ == '__main__':
     # Perform startup checks
     startup_checks()
     
-    # Get port from environment variable (Render provides PORT, but PythonAnywhere uses its own config)
+    # Get port from environment variable (Render provides PORT)
     port = int(os.environ.get('PORT', 5000))
     
     # Determine if running in production
