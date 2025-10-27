@@ -59,7 +59,7 @@ Text Normalization (normalize_text)
 
 The core function for successful verification is normalize_text in verification.py.
 
-Approach: All text (both form input and OCR output) is converted to lowercase and stripped of most special characters (except $\text{.}$ / $\text{-}$ / $\text{%}$) to create a clean, comparable string.
+Approach: All text (both form input and OCR output) is converted to lowercase and stripped of most special characters (except $\text{.}$ / $\text{-}$ / %) to create a clean, comparable string.
 
 Purpose: This mitigates the common issue of OCR introducing small errors (e.g., misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not formatting.
 
