@@ -49,13 +49,13 @@ Link:
 
 ## Design & Approach Documentation
 
-# OCR Tool Selection
+### OCR Tool Selection
 
 Tool Used: Tesseract OCR via pytesseract library
 
 Justification: Tesseract was chosen because it is open-source, free, and can be run locally on the deployment server for Linux deployments like Render. This avoids the complexity and cost of external cloud API keys for the core Minimum Viable Product (MVP).
 
-# Text Normalization (normalize_text)
+### Text Normalization (normalize_text)
 
 The core function for successful verification is normalize_text in verification.py.
 
@@ -63,11 +63,11 @@ Approach: All text (both form input and OCR output) is converted to lowercase an
 
 Purpose: This mitigates the common issue of OCR introducing small errors (e.g., misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not overly strict formatting.
 
-# Key Assumptions and Limitations
+### Key Assumptions and Limitations
 
     | Category           | Assumption/Limitation | Impact                          |
     |--------------------|-----------------------|---------------------------------|
-    | Image Quality      | Flask          | Flask 3.0.0                     |
+    | Image Quality      | Assumes the uploaded labelFlask          | Flask 3.0.0                     |
     | Language           | Tesseract OCR  | pytesseract lib                 |
     | Verification Logic | PIL            | Pillow                          |
     | Language         | Python         | Python 3.11.0                   |
@@ -76,6 +76,7 @@ Purpose: This mitigates the common issue of OCR introducing small errors (e.g., 
 
 
 
+<img width="520" height="437" alt="Failure Bourbon Verification" src="https://github.com/user-attachments/assets/37c1db44-506d-4881-93f6-64523104c82a" />
 
 
 
