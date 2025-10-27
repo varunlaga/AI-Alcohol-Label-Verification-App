@@ -20,7 +20,7 @@ elif sys.platform == 'darwin':
 else:
     # Linux (for Render/Heroku deployment)
     # Tesseract installed via: apt-get install tesseract-ocr
-    pass
+    pytesseract.pytesseract.tesseract_cmd = r'/usr/bin/tesseract'
 
 def extract_text_from_image(image_path):
     """
