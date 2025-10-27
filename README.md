@@ -11,7 +11,7 @@ Link:
 - Form Input: Simplified TTB application form with mandatory and optional key fields
 - Image Upload: Support for JPEG/PNG with a user-friendly drag and drop interface
 - OCR Processing: Tesseract-based text extraction from label images
-- Different Verifications: Fuzzy matching with text normalization (normalize_text function) to account for slight $\text{OCR}$ errors and formatting differences
+- Different Verifications: Fuzzy matching with text normalization (normalize_text function) to account for slight $\text{OCR}$ (Optical Character Recognition) errors and formatting differences
 - Comprehensive Verification Checks:
   - Brand Name Verification (85% similarity threshold for fuzzy matching)
   - Product Class/Type Verification (75% similarity threshold for fuzzy matching)
@@ -50,6 +50,18 @@ Link:
 ## Design & Approach Documentation
 
 OCR Tool Selection
+
+Tool Used: Tesseract OCR via pytesseract library
+
+Justification: Tesseract was chosen because it is open-source, free, and can be run locally on the deployment server for Linux deployments like Render. This avoids the complexity and cost of external cloud API keys for the core Minimum Viable Product (MVP).
+
+Text Normalization (normalize_text)
+
+The core function for successful verification is normalize_text in verification.py.
+
+Approach: All text (both form input and OCR output) is converted to lowercase and stripped of most special characters (except . / - / $\text{%}$) to create a clean, comparable string.
+
+Purpose: This mitigates the common issue of OCR introducing small errors (e.g., misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not formatting.
 
 
 
