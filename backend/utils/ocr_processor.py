@@ -97,7 +97,7 @@ def preprocess_image(image):
         if image.mode != 'RGB':
             image = image.convert('RGB')
         
-        # Resize image if it's too small (improves OCR accuracy)
+        # Resize image if it's too small and improves OCR accuracy
         width, height = image.size
         min_dimension = 1000
         
@@ -107,13 +107,6 @@ def preprocess_image(image):
             new_height = int(height * scale_factor)
             image = image.resize((new_width, new_height), Image.LANCZOS)
             logger.info(f"Image resized to: {new_width}x{new_height}")
-        
-        # Optional: Convert to grayscale (can improve OCR in some cases)
-        # Uncomment if needed:
-        # from PIL import ImageEnhance
-        # image = image.convert('L')
-        # enhancer = ImageEnhance.Contrast(image)
-        # image = enhancer.enhance(2.0)
         
         return image
     
@@ -192,3 +185,4 @@ if __name__ == "__main__":
         print("✗ Tesseract installation test failed")
         print("Please install Tesseract OCR from:")
         print("https://github.com/UB-Mannheim/tesseract/wiki")
+
