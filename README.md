@@ -76,11 +76,25 @@ The application should now be running and accessible in the web browser: http://
 
 ## Configuration and Environment Variables
 
+The application requires specific environment variables to manage security and framework settings. These are loaded locally using a .env file.
 
+### Note
 
+The actual .env file is excluded to protect the SECRET_KEY.
 
+### Setup
 
+#### Create .env file
 
+Copy the provided example file (.env.example) to create the local configuration file named .env in the project's root directory from this command below.
+
+cp .env.example .env
+
+#### Set SECRET_KEY
+
+Open the new .env file and set a strong and unique value for the SECRET_KEY.
+
+The SECRET_KEY variable is required by Flask for session security and must be replaced with a strong and unique string. The FLASK_ENV variable sets the application environment and kept as development and the FLASK_APP variable specifies the main application entry point and kept as backend/app.py.
 
 ## Design & Approach Documentation
 
