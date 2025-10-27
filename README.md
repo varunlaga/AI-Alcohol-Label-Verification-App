@@ -23,13 +23,8 @@ Link:
 
 ## Tech Stack
 
-    | Component        | Technology     | Version/Tool                    |
-    |------------------|----------------|---------------------------------|
-    | Backend Framework| Flask          | Flask 3.0.0                     |
-    | OCR Engine       | Tesseract OCR  | pytesseract lib                 |
-    | Image Processing | PIL            | Pillow                          |
-    | Language         | Python         | Python 3.11.0                   |
-    | Frontend         | HTML, CSS, JS  | HTML5, CSS3, Vanilla JavaScript | 
+    <img width="1037" height="358" alt="image" src="https://github.com/user-attachments/assets/7eca3e6d-d2ee-4ef8-a71c-1f43f7068fd3" />
+
 
 ## How to Run Locally
 
@@ -76,7 +71,6 @@ Purpose: This mitigates the common issue of OCR introducing small errors (e.g., 
 
 
 
-<img width="520" height="437" alt="Failure Bourbon Verification" src="https://github.com/user-attachments/assets/37c1db44-506d-4881-93f6-64523104c82a" />
 
 
 
