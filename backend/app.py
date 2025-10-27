@@ -163,7 +163,7 @@ def verify_label():
             logger.debug(f"Extracted text preview:\n{extracted_text[:300]}...")
             
             # Check if sufficient text was extracted
-            if not extracted_text or len(extracted_text.strip()) < 10:
+            if not extracted_text or len(extracted_text.strip()) < 500:
                 logger.warning("Insufficient text extracted from image")
                 return jsonify({
                     'error': 'Could not read sufficient text from the label image. '
