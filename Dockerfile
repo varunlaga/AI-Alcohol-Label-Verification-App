@@ -21,4 +21,4 @@ COPY . /usr/src/app/
 WORKDIR /usr/src/app/backend
 
 # Define the start command
-CMD ["gunicorn", "app:app", "-b", "0.0.0.0:$PORT"]
+CMD ["gunicorn", "backend.app:app", "-b", "0.0.0.0:$PORT"]
