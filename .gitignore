@@ -23,7 +23,7 @@ settings.py
 # User Uploads and Temporary Files
 # ------------------------------------
 # Ignore the folder where user label images are uploaded
-backend/uploads/
+uploads/
 
 # Log files
 *.log
