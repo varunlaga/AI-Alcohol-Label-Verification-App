@@ -7,8 +7,8 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 import logging
-from utils.ocr_processor import extract_text_from_image, test_tesseract_installation
-from utils.verification import verify_label_data
+from backend.utils.ocr_processor import extract_text_from_image, test_tesseract_installation
+from backend.utils.verification import verify_label_data
 from dotenv import load_dotenv
 from os import environ
 
