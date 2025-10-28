@@ -25,7 +25,7 @@ The project includes a .gitignore file to check out that adheres to best practic
   - Product Class/Type Verification (Fuzzy string comparison against total OCR output and requires a minimum match threshold of 80% using difflib.SequenceMatcher)
   - Alcohol Content Verification (Multiple pattern recognition (like 45% $\text{Alc.}$/Vol.) and numerical tolerance of 0.5)
   - Net Contents Verification (Volume pattern matching (like 750 $\text{mL}$, 12 fl oz, 1 L))
-  - Government Warning Detection (Bonus feature to check for mandatory health warning keywords)
+  - Government Warning Detection (Check for mandatory health warning keywords)
 
 ## Tech Stack
 
