@@ -9,18 +9,17 @@ The project includes a .gitignore file to check out that adheres to best practic
 
 ## Key Features
 
-- Form Input: Simplified TTB application form with mandatory and optional key fields
-- Image Upload: Support for JPEG/PNG with a user-friendly drag and drop interface
-- OCR Processing: Tesseract-based text extraction from label images
-- Different Verifications: Fuzzy matching with text normalization (normalize_text function) to account for slight $\text{OCR}$ (Optical Character Recognition) errors and formatting differences
+- Form Input: Simplified TTB application form with mandatory (Brand Name, Product Class/Type, Alcohol Content) and optional (Net Contents, Government Warning check) key fields
+- Image Upload: Supports common image formats (JPEG, PNG) via a user-friendly upload or drag and drop interface
+- OCR Processing: Uses Tesseract OCR via the pytesseract library for efficient text extraction from label images
+- Clear Results: Provides a detailed field-by-field verification status with specific feedback on match, mismatch, or warnings
+- Error Handling: Gracefully handles common failure scenarios like Tesseract installation errors and cases where OCR could not read sufficient text from the image
 - Comprehensive Verification Checks:
-  - Brand Name Verification (85% similarity threshold for fuzzy matching)
-  - Product Class/Type Verification (75% similarity threshold for fuzzy matching)
+  - Brand Name Verification (Fuzzy string comparison against total OCR output and requires a minimum match threshold of 90% using difflib.SequenceMatcher)
+  - Product Class/Type Verification (Fuzzy string comparison against total OCR output and requires a minimum match threshold of 80% using difflib.SequenceMatcher)
   - Alcohol Content Verification (Multiple pattern recognition (like 45% $\text{Alc.}$/Vol.) and numerical comparison)
   - Net Contents Verification (Volume pattern matching (like 750 $\text{mL}$, 12 fl oz, 1 L))
   - Government Warning Detection (Bonus feature to check for mandatory health warning keywords)
-- Clear Results: Field-by-field verification status with detailed feedback on match/mismatch/warning
-- Error Handling: Graceful handling of $\text{OCR}$ failures, image upload errors, and data mismatches
 
 ## Tech Stack
 
@@ -103,7 +102,7 @@ The SECRET_KEY variable is required by Flask for session security and must be re
 
 Tool Used: Tesseract OCR via pytesseract library
 
-Justification: Tesseract was chosen because it is open-source, free, and can be run locally on the deployment server for Linux deployments like Render. This avoids the complexity and cost of external cloud API keys for the core Minimum Viable Product (MVP).
+Justification: Tesseract was chosen because it is open-source, free, and can be run locally on the deployment server for Linux deployments like Render. This avoids the complexity and cost of external cloud API keys for the core Minimum Viable Product (MVP). The tool is run with the custom config r'--oem 3 --psm 6'. This choice is critical for label verification because --oem 3 represents engine mode and is chosen to utilize the more accurate LSTM neural network engine alongside the legacy engine for the best overall text recognition accuracy and --psm 6 represents page segmentation mode and is chosen to instruct Tesseract to assume a single uniform block of text so this optimizes Tesseract's parsing for tight contained text area.
 
 ### Text Normalization (normalize_text)
 
