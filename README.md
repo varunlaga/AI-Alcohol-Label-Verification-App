@@ -116,6 +116,26 @@ Approach: All text (both form input and OCR output) is converted to lowercase an
 
 Purpose: This mitigates the common issue of OCR introducing small errors (like misreading O for 0, capitalizing randomly, or adding extra spaces) and ensures the comparison is focused on content not overly strict formatting.
 
+### Verification Logic and Thresholds
+
+The core text verification logic relies on both regular expressions (for numerical data) and fuzzy string matching (difflib.SequenceMatcher.ratio()) to determine a match. Specific thresholds were chosen to balance strictness with tolerance for OCR errors.
+
+Brand Name Threshold: 0.90 (90%)
+
+Justification: Brand names are typically short and critical. A very high threshold (90%) is used to ensure the name on the form is an almost exact match to the name on the label so this minimizes the risk of incorrectly approving a different product due to a severe OCR misread.
+
+Product Class/Type Threshold: 0.80 (80%)
+
+Justification: Product types (like "Kentucky Straight Bourbon Whiskey") are often much longer and contain more common words. They are more susceptible to minor OCR errors (like misreading "Straight" or a common punctuation mark). A slightly lower threshold (80%) provides necessary tolerance while still ensuring the primary identity of the product matches.
+
+Alcohol Content (ABV) Tolerance: 0.5
+
+Justification: TTB often allows a small variance in the final alcohol content (like 0.3% difference). Setting a numerical tolerance of 0.5 is realistic because this allows for slight numerical discrepancies that might arise from OCR rounding errors or minor production variances and yet still flags any significant difference.
+
+Minimum Length - Brand Name (4 characters) and Product Type (5 characters): 
+
+Justification: Both checks were implemented to prevent unreliable fuzzy matches on single letters or purely punctuation strings.
+
 ### Key Assumptions and Limitations
 
 |      Category      |                                                    Assumption / Limitation                                                   |                                                         Impact                                                         |   
