@@ -162,7 +162,7 @@ Alcohol Content (ABV) Tolerance: 0.5
 
 Justification: TTB often allows a small variance in the final alcohol content (like 0.3% difference). Setting a numerical tolerance of 0.5 is realistic because this allows for slight numerical discrepancies that might arise from OCR rounding errors or minor production variances and yet still flags any significant difference.
 
-Minimum Length - Brand Name (4 characters) and Product Type (5 characters): 
+Minimum Length - Brand Name (4 characters) and Product Type (3 characters): 
 
 Justification: Both checks were implemented to prevent unreliable fuzzy matches on single letters or purely punctuation strings.
 
