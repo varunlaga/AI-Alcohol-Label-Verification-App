@@ -98,7 +98,7 @@ The SECRET_KEY variable is required by Flask for session security and must be re
 
 ## Testing
 
-The repository includes a test_cases folder and the folder contains three sub folders: Error Test, Failure Test, and Successful Test.  
+The repository includes a test_cases folder and the folder contains three sub folders: Error Test, Failure Test, and Successful Test. Each subfolder contains the sample alcohol label image along with screenshot of the result but Error Test includes a blank white image and displays the error result.
 
 ## Design & Approach Documentation
 
