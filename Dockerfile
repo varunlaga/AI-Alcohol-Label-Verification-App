@@ -11,6 +11,9 @@ RUN apt-get update \
 # (Keep this here so subsequent COPY/RUN commands are relative)
 WORKDIR /usr/src/app
 
+# Add the app directory to the Python path so modules like 'utils' can be found
+ENV PYTHONPATH=/usr/src/app
+
 # Python Dependencies (Cached unless requirements.txt changes) ---
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
