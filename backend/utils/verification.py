@@ -175,19 +175,19 @@ def verify_product_type(form_type, extracted_text):
     
     form_type_stripped = form_type.strip()
 
-    # Increase minimum length to 5 and use 'warning' status
-    if len(form_type_stripped) < 5:
+    # Increase minimum length to 3 and use 'warning' status
+    if len(form_type_stripped) < 3:
         return {
             'field': 'Product Class/Type',
             'status': 'warning',  # Changed from 'mismatch'
-            'message': f"⚠️ Product type must be at least 5 characters long for a reliable check (e.g., 'Whiskey', 'Lager').",
+            'message': f"⚠️ Product type must be at least 3 characters long for a reliable check (e.g., 'Whiskey', 'Lager', 'IPA').",
             'is_match': False
         }
     
     # Check normalized text isn't empty or too short
     normalized = normalize_text(form_type)
-    # Ensure normalized text check also uses minimum 5
-    if not normalized or len(normalized) < 5:
+    # Ensure normalized text check also uses minimum 3
+    if not normalized or len(normalized) < 3:
         return {
             'field': 'Product Class/Type',
             'status': 'warning', # Changed from 'mismatch'
