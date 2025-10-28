@@ -24,4 +24,4 @@ COPY . .
 
 # --- Layer 3: Define the start command (using the fully qualified path) ---
 # Ensure your gunicorn is installed via requirements.txt
-CMD gunicorn backend.app:app -b 0.0.0.0:$PORT
+CMD PYTHONPATH=/usr/src/app gunicorn backend.app:app -b 0.0.0.0:$PORT
