@@ -96,6 +96,10 @@ Open the new .env file and set a strong and unique value for the SECRET_KEY.
 
 The SECRET_KEY variable is required by Flask for session security and must be replaced with a strong and unique string. The FLASK_ENV variable sets the application environment and kept as development and the FLASK_APP variable specifies the main application entry point and kept as backend/app.py.
 
+## Testing
+
+The repository includes a test_cases folder and the folder contains three sub folders: Error Test, Failure Test, and Successful Test.  
+
 ## Design & Approach Documentation
 
 ### OCR Tool Selection
