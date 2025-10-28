@@ -59,7 +59,7 @@ Must have installed:
 #### Create and activate a Python virtual environment
 
 - python -m venv my_venv
-- source my_env/Scripts/activate
+- source my_venv/Scripts/activate
 
 #### Installation
 
