@@ -4,6 +4,8 @@ About: This is an AI-powered full-stack web application designed to simulate the
 
 ## Live App using Render
 
+The app is deployed live using Render and designed for containerized deployment. The Dockerfile is fully compatible with popular container hosting platforms and configured to run the application using Gunicorn. 
+
 App link: https://bottle-sure-verify.onrender.com/
 
 ## Check .gitignore
