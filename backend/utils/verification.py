@@ -123,24 +123,29 @@ def verify_brand_name(form_brand, extracted_text):
     """
     logger.info(f"Verifying brand name: {form_brand}")
     
-    # Validate input length
-    if len(form_brand.strip()) < 2:
+    brand_name_stripped = form_brand.strip()
+
+    # Increase minimum length to 4 and use 'warning' status
+    if len(brand_name_stripped) < 4:
         return {
             'field': 'Brand Name',
-            'status': 'mismatch',
-            'message': f"✗ Brand name must be at least 2 characters long."
+            'status': 'warning',  # Changed from 'mismatch'
+            'message': f"⚠️ Brand name must be at least 4 characters long for a reliable check.",
+            'is_match': False
         }
     
-    # Check normalized text isn't empty
+    # Check normalized text isn't empty or too short
     normalized = normalize_text(form_brand)
-    if not normalized or len(normalized) < 2:
+    # Ensure normalized text check also uses minimum 4
+    if not normalized or len(normalized) < 4:
         return {
             'field': 'Brand Name',
-            'status': 'mismatch',
-            'message': f"✗ Brand name '{form_brand}' contains no valid characters."
+            'status': 'warning', # Changed from 'mismatch'
+            'message': f"⚠️ Brand name '{form_brand}' contains no valid characters or is too short after cleaning.",
+            'is_match': False
         }
     
-    # IMPROVEMENT: Use stricter 90% threshold instead of 85%
+    # Use stricter 90% threshold instead of 85% 
     if contains_text(extracted_text, form_brand, fuzzy=True, threshold=0.90):
         return {
             'field': 'Brand Name',
@@ -168,24 +173,29 @@ def verify_product_type(form_type, extracted_text):
     """
     logger.info(f"Verifying product type: {form_type}")
     
-    # Validate input length
-    if len(form_type.strip()) < 3:
+    form_type_stripped = form_type.strip()
+
+    # Increase minimum length to 5 and use 'warning' status
+    if len(form_type_stripped) < 5:
         return {
             'field': 'Product Class/Type',
-            'status': 'mismatch',
-            'message': f"✗ Product type must be at least 3 characters long."
+            'status': 'warning',  # Changed from 'mismatch'
+            'message': f"⚠️ Product type must be at least 5 characters long for a reliable check (e.g., 'Whiskey', 'Lager').",
+            'is_match': False
         }
     
-    # Check normalized text isn't empty
+    # Check normalized text isn't empty or too short
     normalized = normalize_text(form_type)
-    if not normalized or len(normalized) < 3:
+    # Ensure normalized text check also uses minimum 5
+    if not normalized or len(normalized) < 5:
         return {
             'field': 'Product Class/Type',
-            'status': 'mismatch',
-            'message': f"✗ Product type '{form_type}' contains no valid characters."
+            'status': 'warning', # Changed from 'mismatch'
+            'message': f"⚠️ Product type '{form_type}' contains no valid characters or is too short after cleaning.",
+            'is_match': False
         }
     
-    # IMPROVEMENT: Use stricter 80% threshold instead of 75%
+    # Use stricter 80% threshold instead of 75%
     if contains_text(extracted_text, form_type, fuzzy=True, threshold=0.80):
         return {
             'field': 'Product Class/Type',
