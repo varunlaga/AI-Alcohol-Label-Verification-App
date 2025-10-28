@@ -112,12 +112,21 @@ The following bonus features were implemented.
 
 ### Detailed Compliance Checks
 
+The specific check for the government health warning statement uses a comprehensive list of keywords (like Surgeon General) to ensure compliance beyond simple text extraction and this is implemented in verification.py
 
 ### Refinement of OCR Results
 
+The text normalization (lowercase, special character removal) and difflib.SequenceMatcher for fuzzy matching of Brand Name and Product Type are utilized. This makes the system tolerant to minor OCR errors (e.g., misreading 'O' as '0' or extra spaces) while maintaining strict thresholds (90% for Brand Name, 80% for Product Type) and this is implemented in verification.py.
 
 ### Polish and UX Improvements
 
+- Single-Page Application (SPA) Flow: The form submission and result display are handled asynchronously via fetch implemented in main.js so this eliminates full page reloads and provides a modern user experience.
+
+- Loading Indicator: A visible loading indicator is displayed during the asynchronous server processing phase implemented in main.js and styled in style.css so this provides visual feedback.
+
+- Drag-and-Drop File Upload: The image upload area supports drag-and-drop functionality implemented with specific event listeners in main.js so this simplifies the interaction for users.
+
+- Streamlined Post-Verification Workflow: The clear action buttons are added on the results screen for "Edit Form or Try New Image" and "Verify Another Label". These elements defined in index.html use functions in main.js so this allows users to quickly iterate without resetting the page manually.
 
 ## Design & Approach Documentation
 
