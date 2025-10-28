@@ -145,7 +145,7 @@ def verify_brand_name(form_brand, extracted_text):
             'is_match': False
         }
     
-    # Use stricter 90% threshold instead of 85% 
+    # Use stricter 90% threshold
     if contains_text(extracted_text, form_brand, fuzzy=True, threshold=0.90):
         return {
             'field': 'Brand Name',
@@ -195,7 +195,7 @@ def verify_product_type(form_type, extracted_text):
             'is_match': False
         }
     
-    # Use stricter 80% threshold instead of 75%
+    # Use stricter 80% threshold
     if contains_text(extracted_text, form_type, fuzzy=True, threshold=0.80):
         return {
             'field': 'Product Class/Type',
