@@ -78,7 +78,7 @@ Set environment variables (optional but recommended)
 
 Start the Flask server
 
-- python backend/app.py
+- python -m backend.app
 
 The application should now be running and accessible in the web browser: http://localhost:5000
 
