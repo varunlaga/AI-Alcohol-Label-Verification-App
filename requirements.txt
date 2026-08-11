@@ -1,0 +1,6 @@
+streamlit
+easyocr
+torch
+torchvision
+pillow
+numpy
