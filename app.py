@@ -1,6 +1,6 @@
 import streamlit as st
 from PIL import Image
-from ocr_engine import extract_text_from_image
+from easy_ocr_engine import extract_text_from_image
 from verification import verify_label_compliance
 
 # Page configuration
