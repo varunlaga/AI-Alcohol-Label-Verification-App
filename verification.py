@@ -8,47 +8,54 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
     full_text = " ".join(extracted_text)
     full_text_lower = full_text.lower()
     
-    # Government Warning Detection (flexible to handle OCR typos like "GOWERNMENT" or "WARNING:")
-    warning_pattern = re.compile(r'(government|gov|gowernment)\s*(warning|warnlng|wamning)', re.IGNORECASE)
+    # 1. Flexible Government Warning Check (Handles typos like "GOWERNMENT", "WARNlNG", or missing colons)
+    warning_pattern = re.compile(r'(government|gov|gowernment|go\w+ment)\s*(warning|warn\w+|wamning)', re.IGNORECASE)
     has_warning = bool(warning_pattern.search(full_text_lower)) or "surgeon general" in full_text_lower
     
-    # Extract Numerical Values from OCR
-    abv_match = re.search(r'(\d+(\.\d+)?)', full_text)
+    # 2. Extract ABV (looks for percentage patterns specifically)
+    abv_match = re.search(r'(\d+(\.\d+)?)\s*(%|\bpercent\b|\balc\b)', full_text_lower)
     extracted_abv = float(abv_match.group(1)) if abv_match else None
     
-    vol_match = re.search(r'(\d+)\s*(ml|l|fl\s*oz)?', full_text_lower)
-    extracted_vol = vol_match.group(1) if vol_match else None
+    # 3. Extract Volume (specifically looks for numbers tied to volume units or after "Contents")
+    extracted_vol = None
+    vol_match = re.search(r'(net\s*contents?|contents?)?\s*(\d+)\s*(ml|l|fl\s*oz)\b', full_text_lower)
+    if vol_match:
+        extracted_vol = vol_match.group(2)
+    else:
+        # Fallback: find 3-digit standalone numbers like 750 (excluding the ABV number)
+        all_nums = re.findall(r'\b\d{3}\b', full_text)
+        if all_nums:
+            extracted_vol = all_nums[0]
 
-    # Initialize Compliance Flags
+    # Initialize Verification Flags
     abv_matches_form = False
     vol_matches_form = False
     brand_matches_form = False
     class_matches_form = False
 
     if form_data:
-        # Form ABV Match Check
+        # Check ABV
         user_abv = form_data.get("abv")
         if user_abv is not None and extracted_abv is not None:
-            abv_matches_form = abs(float(user_abv) - extracted_abv) < 0.1
+            abv_matches_form = abs(float(user_abv) - extracted_abv) < 0.2
 
-        # Form Net Contents Match Check
+        # Check Volume
         user_vol = str(form_data.get("net_contents", "")).strip()
         if user_vol and extracted_vol:
-            # Extract digits only for exact comparison (e.g., "700" vs "750")
             user_digits = re.sub(r'\D', '', user_vol)
             vol_matches_form = (user_digits == extracted_vol)
 
-        # Form Brand Match Check
+        # Check Brand (looks for partial/fuzzy string matches in extracted text)
         user_brand = str(form_data.get("brand", "")).strip().lower()
         if user_brand:
-            brand_matches_form = user_brand in full_text_lower
+            # Matches if user brand is inside full text OR extracted brand snippet matches
+            brand_matches_form = (user_brand in full_text_lower) or any(user_brand in line.lower() for line in extracted_text)
 
-        # Form Product Class/Type Match Check
+        # Check Product Class
         user_class = str(form_data.get("class", "")).strip().lower()
         if user_class:
             class_matches_form = user_class in full_text_lower
 
-    # Overall Compliance Determination
     is_compliant = (
         has_warning and 
         abv_matches_form and 

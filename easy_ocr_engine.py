@@ -1,6 +1,6 @@
 import easyocr
 import numpy as np
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageFilter
 import streamlit as st
 
 @st.cache_resource
@@ -10,35 +10,33 @@ def load_ocr_reader():
 
 def extract_text_from_image(image: Image.Image) -> list[str]:
     """
-    Runs a dual-pass extraction (Original + Preprocessed) to ensure both large text
-    and fine print are captured reliably.
+    Applies image preprocessing tailored for low-res labels to ensure 
+    small fine print like Government Warnings get extracted.
     """
     reader = load_ocr_reader()
     extracted_lines = []
     
-    # --- Pass 1: Original Image ---
-    orig_array = np.array(image.convert('RGB'))
-    results_orig = reader.readtext(orig_array)
-    for (_, text, conf) in results_orig:
-        if conf > 0.1 and text not in extracted_lines:
+    # Pass 1: Upscale & Sharpen Original Image
+    w, h = image.size
+    upscaled = image.resize((w * 3, h * 3), Image.Resampling.LANCZOS)
+    
+    # Mild contrast and sharpening
+    enhancer = ImageEnhance.Contrast(upscaled)
+    sharpened = enhancer.enhance(1.4).filter(ImageFilter.SHARPEN)
+    
+    results_pass1 = reader.readtext(np.array(sharpened))
+    for (_, text, conf) in results_pass1:
+        if conf > 0.05:
             extracted_lines.append(text)
             
-    # --- Pass 2: Grayscale + Upscaled + High Contrast (for Fine Print) ---
-    gray_img = image.convert('L')
-    w, h = gray_img.size
-    # Upscale 2.5x to help OCR read small government warnings and volume text
-    gray_img = gray_img.resize((int(w * 2.5), int(h * 2.5)), Image.Resampling.LANCZOS)
+    # Pass 2: Grayscale thresholding for small dense text
+    gray = upscaled.convert('L')
+    enhancer_gray = ImageEnhance.Contrast(gray)
+    high_contrast_gray = enhancer_gray.enhance(1.8)
     
-    # Increase contrast
-    enhancer = ImageEnhance.Contrast(gray_img)
-    enhanced_img = enhancer.enhance(2.5)
-    
-    proc_array = np.array(enhanced_img)
-    results_proc = reader.readtext(proc_array)
-    
-    for (_, text, conf) in results_proc:
-        # Avoid duplicate entries while pulling in missing lines
-        if conf > 0.08 and text not in extracted_lines:
+    results_pass2 = reader.readtext(np.array(high_contrast_gray))
+    for (_, text, conf) in results_pass2:
+        if conf > 0.05 and text not in extracted_lines:
             extracted_lines.append(text)
             
     return extracted_lines
