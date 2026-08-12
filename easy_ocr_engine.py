@@ -1,6 +1,6 @@
 import easyocr
 import numpy as np
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageEnhance, ImageOps
 import streamlit as st
 
 @st.cache_resource
@@ -9,29 +9,19 @@ def load_ocr_reader():
 
 def extract_text_from_image(image: Image.Image) -> list[str]:
     reader = load_ocr_reader()
-    extracted_lines = []
     
-    # Base 3x Upscaling
+    # 1. Upscale 2x for clarity
     w, h = image.size
-    scaled = image.resize((w * 3, h * 3), Image.Resampling.LANCZOS)
+    scaled = image.resize((w * 2, h * 2), Image.Resampling.LANCZOS)
     
-    # Image Pass 1: Sharpened RGB (Good for large colored text)
-    pass1 = ImageEnhance.Sharpness(scaled).enhance(2.0)
+    # 2. Convert to Grayscale & Enhances Contrast
+    gray = ImageOps.autocontrast(scaled.convert('L'))
+    enhancer = ImageEnhance.Contrast(gray)
+    enhanced = enhancer.enhance(1.5)
     
-    # Image Pass 2: Grayscale + Autocontrast (Good for medium text)
-    pass2 = ImageOps.autocontrast(scaled.convert('L'))
+    # 3. Single OCR pass with clean string outputs
+    results = reader.readtext(np.array(enhanced), detail=0, paragraph=False)
     
-    # Image Pass 3: High Contrast Binary Threshold (Good for tiny/blurry fine print)
-    pass3 = ImageEnhance.Contrast(pass2).enhance(3.0)
-    
-    passes = [pass1, pass2, pass3]
-    
-    for img_pass in passes:
-        results = reader.readtext(np.array(img_pass))
-        for (_, text, conf) in results:
-            clean_text = text.strip()
-            # Lower confidence floor (0.02) to capture small warning text
-            if conf > 0.02 and clean_text and clean_text not in extracted_lines:
-                extracted_lines.append(clean_text)
-                
+    # Clean whitespace and drop empty lines
+    extracted_lines = [text.strip() for text in results if text.strip()]
     return extracted_lines
