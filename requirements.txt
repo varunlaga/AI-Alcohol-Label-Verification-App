@@ -5,3 +5,4 @@ torchvision
 pillow
 numpy
 thefuzz
+opencv-python-headless
