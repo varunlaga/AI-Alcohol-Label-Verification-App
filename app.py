@@ -62,13 +62,30 @@ with col2:
     if submit_btn and uploaded_file is not None:
         with st.spinner("Extracting text and verifying rules..."):
             extracted_lines = extract_text_from_image(image)
-            results = verify_label_compliance(extracted_lines)
+            
+            # Package form inputs into a dictionary
+            form_data = {
+                "brand": brand_name,
+                "class": product_class,
+                "abv": abv_input,
+                "net_contents": net_contents
+            }
+            
+            # Pass form_data to the verification engine
+            results = verify_label_compliance(extracted_lines, form_data=form_data)
         
         # Display Compliance Badge
         if results["is_compliant"]:
             st.success("✅ COMPLIANT LABEL")
         else:
             st.error("❌ NON-COMPLIANT LABEL")
+            
+        # Display Submitted Details Summary
+        st.markdown("**Submitted Application Details:**")
+        st.write(f"- **Brand:** {brand_name if brand_name else 'N/A'}")
+        st.write(f"- **Class/Type:** {product_class if product_class else 'N/A'}")
+        st.write(f"- **ABV:** {abv_input}%")
+        st.write(f"- **Net Contents:** {net_contents if net_contents else 'N/A'}")
         
         # Checklist Table
         st.markdown("**Rule Verification Checklist:**")
@@ -81,8 +98,3 @@ with col2:
         # Extracted Information Details
         with st.expander("View Extracted Metadata & OCR Raw Text"):
             st.json(results["extracted_details"])
-            
-    elif submit_btn and uploaded_file is None:
-        st.warning("Please upload a label image before submitting.")
-    else:
-        st.info("Fill out the form and upload an image on the left to trigger the automated check.")
