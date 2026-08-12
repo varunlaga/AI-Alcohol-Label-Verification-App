@@ -14,7 +14,7 @@ st.set_page_config(
 st.markdown("""
     <style>
     .stApp {
-        background-color: #FFFFFF;
+        background-color: #F5F6F8;
         color: #1E1E1E;
     }
     .stButton>button {
@@ -26,24 +26,40 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🔍 LabelCheck AI")
-st.caption("AI-Powered Compliance Label Verification System")
+st.caption("AI-Powered Alcohol Label Verification System")
 
 st.markdown("---")
 
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.subheader("Upload Label")
-    uploaded_file = st.file_uploader("Select a label image to verify", type=["png", "jpg", "jpeg"])
+    st.subheader("Product Application Form")
+    
+    with st.form("label_verification_form"):
+        brand_name = st.text_input("Brand Name *", help="Minimum 4 characters")
+        product_class = st.text_input("Product Class/Type *", help="E.g., Bourbon Whiskey, Vodka, IPA")
+        
+        col_abv, col_net = st.columns(2)
+        with col_abv:
+            abv_input = st.number_input("Alcohol Content (ABV %) *", min_value=0.0, max_value=100.0, step=0.1)
+        with col_net:
+            net_contents = st.text_input("Net Contents (Optional)", help="E.g., 750 mL, 12 fl oz, 1 L")
+            
+        uploaded_file = st.file_uploader(
+            "Select a label image to verify *", 
+            type=["png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"]
+        )
+        
+        submit_btn = st.form_submit_button("Verify Label", type="primary", use_container_width=True)
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Label", width="stretch")
+        st.image(image, caption="Uploaded Label", use_container_width=True)
 
 with col2:
     st.subheader("Verification Results")
     
-    if uploaded_file is not None:
+    if submit_btn and uploaded_file is not None:
         with st.spinner("Extracting text and verifying rules..."):
             extracted_lines = extract_text_from_image(image)
             results = verify_label_compliance(extracted_lines)
@@ -65,5 +81,8 @@ with col2:
         # Extracted Information Details
         with st.expander("View Extracted Metadata & OCR Raw Text"):
             st.json(results["extracted_details"])
+            
+    elif submit_btn and uploaded_file is None:
+        st.warning("Please upload a label image before submitting.")
     else:
-        st.info("Upload an image on the left to trigger the automated check.")
+        st.info("Fill out the form and upload an image on the left to trigger the automated check.")
