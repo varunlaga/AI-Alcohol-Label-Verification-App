@@ -63,7 +63,6 @@ with col2:
         with st.spinner("Extracting text and verifying rules..."):
             extracted_lines = extract_text_from_image(image)
             
-            # Package form inputs into a dictionary
             form_data = {
                 "brand": brand_name,
                 "class": product_class,
@@ -71,30 +70,22 @@ with col2:
                 "net_contents": net_contents
             }
             
-            # Pass form_data to the verification engine
             results = verify_label_compliance(extracted_lines, form_data=form_data)
         
         # Display Compliance Badge
         if results["is_compliant"]:
-            st.success("✅ COMPLIANT LABEL")
+            st.success("✅ COMPLIANT LABEL - ALL MATCHES PASSED")
         else:
-            st.error("❌ NON-COMPLIANT LABEL")
-            
-        # Display Submitted Details Summary
-        st.markdown("**Submitted Application Details:**")
-        st.write(f"- **Brand:** {brand_name if brand_name else 'N/A'}")
-        st.write(f"- **Class/Type:** {product_class if product_class else 'N/A'}")
-        st.write(f"- **ABV:** {abv_input}%")
-        st.write(f"- **Net Contents:** {net_contents if net_contents else 'N/A'}")
+            st.error("❌ NON-COMPLIANT LABEL - MISMATCH OR MISSING DATA")
         
         # Checklist Table
-        st.markdown("**Rule Verification Checklist:**")
+        st.markdown("**Rule & Form Verification Checklist:**")
         for check, passed in results["checks"].items():
             if passed:
                 st.write(f"✔️ **{check}**: Passed")
             else:
-                st.write(f"❌ **{check}**: Missing/Failed")
+                st.write(f"❌ **{check}**: Mismatch / Failed")
                 
-        # Extracted Information Details
+        # Extracted Details Expander
         with st.expander("View Extracted Metadata & OCR Raw Text"):
             st.json(results["extracted_details"])
