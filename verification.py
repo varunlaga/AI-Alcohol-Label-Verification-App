@@ -34,22 +34,22 @@ def extract_volume(full_text: str) -> str | None:
     return None
 
 def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -> dict:
-    # 1. Normalize all extracted text to lowercase for internal processing
+    # Normalize all extracted text to lowercase for internal processing
     full_text_lower = " ".join(extracted_text).lower()
     lower_extracted_lines = [line.lower() for line in extracted_text]
     
-    # 2. Case-Insensitive Government Warning Detection
+    # Case-Insensitive Government Warning Detection
     has_warning = (
         bool(re.search(r'(gov\w*|surgeon)\s*(war\w*|general)', full_text_lower, re.IGNORECASE)) or
         any(fuzz.partial_ratio("government warning", line) >= 55 for line in lower_extracted_lines) or
         any(fuzz.partial_ratio("surgeon general", line) >= 55 for line in lower_extracted_lines)
     )
     
-    # 3. Extract Values
+    # Extract Values
     extracted_abv = extract_abv(full_text_lower)
     extracted_vol = extract_volume(full_text_lower)
 
-    # 4. Form Validation Flags
+    # Form Validation Flags
     abv_matches = False
     vol_matches = False
     brand_matches = False
@@ -68,7 +68,7 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
         if user_vol_digits and extracted_vol:
             vol_matches = (user_vol_digits == extracted_vol)
         elif not user_vol_digits and extracted_vol:
-            vol_matches = True  # Optional form field left blank
+            vol_matches = False  # Fails if left blank or if extracted volume is missing
 
         # Case-Insensitive Fuzzy Brand Match (e.g., 'FANCY', 'Fancy', 'fancy')
         user_brand = str(form_data.get("brand", "")).strip().lower()
