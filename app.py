@@ -50,11 +50,11 @@ with col1:
             type=["png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"]
         )
         
-        submit_btn = st.form_submit_button("Verify Label", type="primary", use_container_width=True)
+        submit_btn = st.form_submit_button("Verify Label", type="primary", width='stretch')
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Label", use_container_width=True)
+        st.image(image, caption="Uploaded Label", width='stretch')
 
 with col2:
     st.subheader("Verification Results")
