@@ -5,7 +5,6 @@ def extract_abv(full_text: str) -> float | None:
     """
     Generalized ABV extraction using flexible patterns and Proof fallback arithmetic.
     """
-    # Direct ABV Percentage pattern (e.g., '40.0%', '40% ALC', '5.5% abv', '40,0')
     abv_match = re.search(r'(\d{1,2}[\.,]?\d?)\s*(?:%|\*|\bpercent\b|\balc\b|\bvol\b)', full_text, re.IGNORECASE)
     if abv_match:
         val_str = abv_match.group(1).replace(',', '.')
@@ -16,7 +15,6 @@ def extract_abv(full_text: str) -> float | None:
         except ValueError:
             pass
 
-    # Proof Fallback (Proof / 2 = ABV) e.g., '80 Proof', '100 PROOF', '80 prf'
     proof_match = re.search(r'(\d{2,3})\s*(?:proof|prf|pruun|prun)', full_text, re.IGNORECASE)
     if proof_match:
         try:
@@ -32,12 +30,10 @@ def extract_volume(full_text: str) -> str | None:
     """
     Generalized Net Volume extraction using standard liquid bottle numbers and unit regex.
     """
-    # Match standard bottle volumes directly (750, 1000, 500, 375, 700, 355, 50)
     standard_match = re.search(r'\b(1000|750|700|500|375|355|50)\b', full_text)
     if standard_match:
         return standard_match.group(1)
 
-    # General unit match (digits near ml, l, fl oz, cl)
     vol_match = re.search(r'(\d{2,4})\s*(?:ml|l|fl\s*oz|oz|cl)\b', full_text, re.IGNORECASE)
     if vol_match:
         return vol_match.group(1)
@@ -53,7 +49,6 @@ def extract_government_warning(extracted_text: list[str]) -> str:
     recording = False
 
     for line in extracted_text:
-        # Detect start of government warning block via regex or fuzzy match
         if (re.search(r'(gov\w*|surgeon)\s*(war\w*|general)', line, re.IGNORECASE) or
             fuzz.partial_ratio("government warning", line.lower()) >= 45 or
             fuzz.partial_ratio("surgeon general", line.lower()) >= 45):
@@ -62,10 +57,29 @@ def extract_government_warning(extracted_text: list[str]) -> str:
         if recording:
             warning_lines.append(line.strip())
 
-    if warning_lines:
-        return " ".join(warning_lines)
+    return " ".join(warning_lines) if warning_lines else "Not Present"
+
+def find_extracted_text_line(extracted_text: list[str], user_input: str) -> str | None:
+    """
+    Finds and returns the actual line of text extracted from the OCR image
+    that best matches the form field input.
+    """
+    if not user_input:
+        return None
     
-    return "Not Present"
+    best_line = None
+    highest_similarity = 0
+    
+    for line in extracted_text:
+        score = fuzz.ratio(user_input.lower(), line.lower())
+        partial_score = fuzz.partial_ratio(user_input.lower(), line.lower())
+        combined_score = max(score, partial_score)
+        
+        if combined_score > highest_similarity and combined_score >= 40:
+            highest_similarity = combined_score
+            best_line = line.strip()
+            
+    return best_line
 
 def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -> dict:
     full_text_lower = " ".join(extracted_text).lower()
@@ -84,12 +98,15 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
     class_matches = False
 
     if form_data:
-        # ABV Check (Tolerates +/- 0.5% deviation)
-        user_abv = form_data.get("abv")
-        if user_abv is not None and user_abv > 0 and extracted_abv is not None:
-            abv_matches = abs(float(user_abv) - extracted_abv) <= 0.5
+        # ABV Check (Exact match check safely handles strings and floats)
+        user_abv_raw = form_data.get("abv")
+        if user_abv_raw is not None and extracted_abv is not None:
+            try:
+                abv_matches = (float(user_abv_raw) == extracted_abv)
+            except (ValueError, TypeError):
+                abv_matches = False
 
-        # Volume Check (Compares raw digits only; passes if omitted in form)
+        # Volume Check
         user_vol_raw = str(form_data.get("net_contents", "")).strip()
         user_vol_digits = re.sub(r'\D', '', user_vol_raw)
         
@@ -116,9 +133,12 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
 
     is_compliant = all([has_warning, abv_matches, vol_matches, brand_matches, class_matches])
 
-    # Values for extracted metadata summary
-    user_brand_val = form_data.get("brand", "").strip() if form_data else ""
-    user_class_val = (form_data.get("product_class", "") or form_data.get("class", "")).strip() if form_data else ""
+    # Extract OCR lines for displaying actual image metadata
+    user_brand_raw = form_data.get("brand", "").strip() if form_data else ""
+    user_class_raw = (form_data.get("product_class", "") or form_data.get("class", "")).strip() if form_data else ""
+
+    extracted_brand_text = find_extracted_text_line(extracted_text, user_brand_raw)
+    extracted_class_text = find_extracted_text_line(extracted_text, user_class_raw)
 
     return {
         "is_compliant": is_compliant,
@@ -130,8 +150,8 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
             "Net Volume Matches Form": vol_matches
         },
         "extracted_details": {
-            "Extracted Brand Name": user_brand_val if brand_matches else "Not Found",
-            "Extracted Product/Class Type": user_class_val if class_matches else "Not Found",
+            "Extracted Brand Name": extracted_brand_text if extracted_brand_text else "Not Found",
+            "Extracted Product/Class Type": extracted_class_text if extracted_class_text else "Not Found",
             "Extracted ABV": f"{extracted_abv}%" if extracted_abv is not None else "Not Found",
             "Extracted Net Contents": f"{extracted_vol} mL" if extracted_vol is not None else "Not Found",
             "Extracted Government Warning": extracted_warning
