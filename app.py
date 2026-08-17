@@ -25,7 +25,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🔍 LabelCheck AI")
+st.title("🍷 LabelCheck AI")
 st.caption("AI-Powered Alcohol Label Verification System")
 
 st.markdown("---")
