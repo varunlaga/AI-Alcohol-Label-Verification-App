@@ -6,7 +6,7 @@ from verification import verify_label_compliance
 # Page configuration
 st.set_page_config(
     page_title="LabelCheck AI",
-    page_icon="🔍",
+    page_icon="🍷",
     layout="wide"
 )
 
@@ -47,7 +47,7 @@ with col1:
         # Product Class/Type
         st.markdown("Product Class/Type <span style='color:red;'>*</span>", unsafe_allow_html=True)
         product_class = st.text_input("Product Class/Type", label_visibility="collapsed")
-        st.caption("E.g., Bourbon Whiskey, Vodka, IPA")
+        st.caption("Minimum 3 characters")
         
         col_abv, col_net = st.columns(2)
         with col_abv:
@@ -90,8 +90,8 @@ with col2:
             st.error("⚠️ Brand Name must be at least 4 characters long.")
             is_valid = False
             
-        if not product_class.strip():
-            st.error("⚠️ Product Class/Type is required.")
+        if len(product_class.strip()) < 3:
+            st.error("⚠️ Product Class/Type must be at least 3 characters long.")
             is_valid = False
             
         if abv_input <= 0.0:
@@ -109,7 +109,7 @@ with col2:
                 
                 form_data = {
                     "brand": brand_name.strip(),
-                    "class": product_class.strip(),
+                    "product_class": product_class.strip(),
                     "abv": abv_input,
                     "net_contents": net_contents.strip()
                 }
