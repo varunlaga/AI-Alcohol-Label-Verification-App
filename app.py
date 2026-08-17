@@ -118,7 +118,7 @@ with col2:
             
             # Display Compliance Badge
             if results["is_compliant"]:
-                st.success("✅ COMPLIANT LABEL - ALL MATCHES PASSED")
+                st.success("✔️ COMPLIANT LABEL - ALL MATCHES PASSED")
             else:
                 st.error("❌ NON-COMPLIANT LABEL - MISMATCH OR MISSING DATA")
             
