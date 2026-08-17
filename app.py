@@ -131,5 +131,5 @@ with col2:
                     st.write(f"❌ **{check}**: Mismatch / Failed")
                     
             # Extracted Details Expander
-            with st.expander("View Extracted Metadata & OCR Raw Text"):
+            with st.expander("View Extracted OCR Metadata"):
                 st.json(results["extracted_details"])

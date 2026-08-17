@@ -44,16 +44,36 @@ def extract_volume(full_text: str) -> str | None:
 
     return None
 
+def extract_government_warning(extracted_text: list[str]) -> str:
+    """
+    Extracts and joins all lines belonging to the Government Warning text block.
+    Returns 'Not Present' if no warning header is detected.
+    """
+    warning_lines = []
+    recording = False
+
+    for line in extracted_text:
+        # Detect start of government warning block via regex or fuzzy match
+        if (re.search(r'(gov\w*|surgeon)\s*(war\w*|general)', line, re.IGNORECASE) or
+            fuzz.partial_ratio("government warning", line.lower()) >= 45 or
+            fuzz.partial_ratio("surgeon general", line.lower()) >= 45):
+            recording = True
+
+        if recording:
+            warning_lines.append(line.strip())
+
+    if warning_lines:
+        return " ".join(warning_lines)
+    
+    return "Not Present"
+
 def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -> dict:
     full_text_lower = " ".join(extracted_text).lower()
     lower_extracted_lines = [line.lower() for line in extracted_text]
 
-    # Generalized Government Warning Detection (Fuzzy matching + Regex)
-    has_warning = (
-        bool(re.search(r'(gov\w*|surgeon)\s*(war\w*|general)', full_text_lower, re.IGNORECASE)) or
-        any(fuzz.partial_ratio("government warning", line) >= 45 for line in lower_extracted_lines) or
-        any(fuzz.partial_ratio("surgeon general", line) >= 45 for line in lower_extracted_lines)
-    )
+    # Government Warning Extraction
+    extracted_warning = extract_government_warning(extracted_text)
+    has_warning = (extracted_warning != "Not Present")
 
     extracted_abv = extract_abv(full_text_lower)
     extracted_vol = extract_volume(full_text_lower)
@@ -69,12 +89,14 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
         if user_abv is not None and user_abv > 0 and extracted_abv is not None:
             abv_matches = abs(float(user_abv) - extracted_abv) <= 0.5
 
-        # Volume Check (Compares raw digits only)
+        # Volume Check (Compares raw digits only; passes if omitted in form)
         user_vol_raw = str(form_data.get("net_contents", "")).strip()
         user_vol_digits = re.sub(r'\D', '', user_vol_raw)
         
         if user_vol_digits and extracted_vol:
             vol_matches = (user_vol_digits == extracted_vol)
+        elif not user_vol_digits:
+            vol_matches = True
 
         # Generalized Fuzzy Brand Match
         user_brand = str(form_data.get("brand", "")).strip().lower()
@@ -94,6 +116,10 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
 
     is_compliant = all([has_warning, abv_matches, vol_matches, brand_matches, class_matches])
 
+    # Values for extracted metadata summary
+    user_brand_val = form_data.get("brand", "").strip() if form_data else ""
+    user_class_val = (form_data.get("product_class", "") or form_data.get("class", "")).strip() if form_data else ""
+
     return {
         "is_compliant": is_compliant,
         "checks": {
@@ -104,8 +130,10 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
             "Net Volume Matches Form": vol_matches
         },
         "extracted_details": {
+            "Extracted Brand Name": user_brand_val if brand_matches else "Not Found",
+            "Extracted Product/Class Type": user_class_val if class_matches else "Not Found",
             "Extracted ABV": f"{extracted_abv}%" if extracted_abv is not None else "Not Found",
-            "Extracted Volume": f"{extracted_vol} mL" if extracted_vol is not None else "Not Found",
-            "Raw Text Lines": extracted_text
+            "Extracted Net Contents": f"{extracted_vol} mL" if extracted_vol is not None else "Not Found",
+            "Extracted Government Warning": extracted_warning
         }
     }
