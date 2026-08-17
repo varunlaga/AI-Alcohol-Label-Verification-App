@@ -36,21 +36,40 @@ with col1:
     st.subheader("Product Application Form")
     
     with st.form("label_verification_form"):
-        brand_name = st.text_input("Brand Name *", help="Minimum 4 characters")
-        product_class = st.text_input("Product Class/Type *", help="E.g., Bourbon Whiskey, Vodka, IPA")
-        
+        # Brand Name
+        st.markdown("Brand Name <span style='color:red;'>*</span>", unsafe_allow_html=True)
+        brand_name = st.text_input("Brand Name", label_visibility="collapsed")
+        st.caption("Minimum 4 characters")
+    
+        # Product Class/Type
+        st.markdown("Product Class/Type <span style='color:red;'>*</span>", unsafe_allow_html=True)
+        product_class = st.text_input("Product Class/Type", label_visibility="collapsed")
+        st.caption("E.g., Bourbon Whiskey, Vodka, IPA")
+    
         col_abv, col_net = st.columns(2)
         with col_abv:
-            abv_input = st.number_input("Alcohol Content (ABV %) *", min_value=0.0, max_value=100.0, step=0.1)
-        with col_net:
-            net_contents = st.text_input("Net Contents (Optional)", help="E.g., 750 mL, 12 fl oz, 1 L")
-            
-        uploaded_file = st.file_uploader(
-            "Select a label image to verify *", 
-            type=["png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"]
-        )
+            st.markdown("Alcohol Content (ABV %) <span style='color:red;'>*</span>", unsafe_allow_html=True)
+            abv_input = st.number_input(
+                "Alcohol Content (ABV %)", 
+                min_value=0.0, 
+                max_value=100.0, 
+                step=0.1, 
+                label_visibility="collapsed"
+            )
         
-        # Updated to width="stretch"
+        with col_net:
+            st.markdown("Net Contents (Optional)", unsafe_allow_html=True)
+            net_contents = st.text_input("Net Contents", label_visibility="collapsed")
+            st.caption("E.g., 750 mL, 12 fl oz, 1 L")
+        
+        # File Uploader
+        st.markdown("Select a label image to verify <span style='color:red;'>*</span>", unsafe_allow_html=True)
+        uploaded_file = st.file_uploader(
+            "Select a label image to verify", 
+            type=["png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"],
+            label_visibility="collapsed"
+        )
+    
         submit_btn = st.form_submit_button("Verify Label", type="primary", width="stretch")
 
     if uploaded_file is not None:
