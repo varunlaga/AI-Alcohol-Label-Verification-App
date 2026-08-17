@@ -26,7 +26,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🍷 LabelCheck AI")
-st.caption("AI-Powered Alcohol Label Verification System")
+st.caption("AI-Powered Alcohol Label Verification App")
 
 st.markdown("---")
 
@@ -81,6 +81,7 @@ with col1:
 
 with col2:
     st.subheader("Verification Results")
+    st.caption("Results will be displayed here after submission.")
     
     # Validation logic executed upon clicking submission
     if submit_btn:

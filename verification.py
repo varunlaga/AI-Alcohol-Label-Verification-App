@@ -59,27 +59,26 @@ def extract_government_warning(extracted_text: list[str]) -> str:
 
     return " ".join(warning_lines) if warning_lines else "Not Present"
 
-def find_extracted_text_line(extracted_text: list[str], user_input: str) -> str | None:
-    """
-    Finds and returns the actual line of text extracted from the OCR image
-    that best matches the form field input.
-    """
-    if not user_input:
-        return None
-    
-    best_line = None
-    highest_similarity = 0
-    
+def extract_product_class_from_image(full_text: str) -> str | None:
+    """Extracts known spirit/beverage class types directly from OCR text."""
+    classes = [
+        "vodka", "whiskey", "whisky", "bourbon", "rum", "gin", 
+        "tequila", "brandy", "cognac", "liqueur", "mezcal", "scotch", "wine", "beer"
+    ]
+    for p_class in classes:
+        if re.search(r'\b' + p_class + r'\b', full_text, re.IGNORECASE):
+            return p_class.capitalize()
+    return None
+
+def extract_brand_from_image(extracted_text: list[str]) -> str | None:
+    """Extracts candidate brand text line directly from OCR lines."""
     for line in extracted_text:
-        score = fuzz.ratio(user_input.lower(), line.lower())
-        partial_score = fuzz.partial_ratio(user_input.lower(), line.lower())
-        combined_score = max(score, partial_score)
-        
-        if combined_score > highest_similarity and combined_score >= 40:
-            highest_similarity = combined_score
-            best_line = line.strip()
-            
-    return best_line
+        line_clean = line.strip()
+        # Skip warning lines, numerical specs, or common metadata
+        if (len(line_clean) >= 3 and 
+            not re.search(r'(warning|surgeon|alc|vol|proof|net|contents|\d)', line_clean, re.IGNORECASE)):
+            return line_clean
+    return extracted_text[0].strip() if extracted_text else None
 
 def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -> dict:
     full_text_lower = " ".join(extracted_text).lower()
@@ -113,7 +112,7 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
         if user_vol_digits and extracted_vol:
             vol_matches = (user_vol_digits == extracted_vol)
         elif not user_vol_digits:
-            vol_matches = True
+            vol_matches = False
 
         # Generalized Fuzzy Brand Match
         user_brand = str(form_data.get("brand", "")).strip().lower()
@@ -134,11 +133,8 @@ def verify_label_compliance(extracted_text: list[str], form_data: dict = None) -
     is_compliant = all([has_warning, abv_matches, vol_matches, brand_matches, class_matches])
 
     # Extract OCR lines for displaying actual image metadata
-    user_brand_raw = form_data.get("brand", "").strip() if form_data else ""
-    user_class_raw = (form_data.get("product_class", "") or form_data.get("class", "")).strip() if form_data else ""
-
-    extracted_brand_text = find_extracted_text_line(extracted_text, user_brand_raw)
-    extracted_class_text = find_extracted_text_line(extracted_text, user_class_raw)
+    extracted_brand_text = extract_brand_from_image(extracted_text)
+    extracted_class_text = extract_product_class_from_image(full_text_lower)
 
     return {
         "is_compliant": is_compliant,
