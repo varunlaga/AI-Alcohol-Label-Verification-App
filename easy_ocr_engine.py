@@ -1,3 +1,4 @@
+import os
 import cv2
 import easyocr
 import numpy as np
@@ -6,7 +7,20 @@ import streamlit as st
 
 @st.cache_resource
 def load_ocr_reader():
-    return easyocr.Reader(['en'], gpu=False)
+    """
+    Caches the EasyOCR Reader instance across user sessions
+    to prevent re-downloading model weights or hitting RAM limits.
+    """
+    # Create model cache folder
+    model_dir = os.path.join(os.path.expanduser("~"), ".EasyOCR", "model")
+    os.makedirs(model_dir, exist_ok=True)
+    
+    return easyocr.Reader(
+        ['en'], 
+        gpu=False, 
+        model_storage_directory=model_dir,
+        download_enabled=True
+    )
 
 def preprocess_image_generalized(image: Image.Image) -> np.ndarray:
     """
@@ -22,7 +36,6 @@ def preprocess_image_generalized(image: Image.Image) -> np.ndarray:
         img_gray = cv2.resize(img_gray, (0, 0), fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
     
     # Contrast Limited Adaptive Histogram Equalization (CLAHE)
-    # Enhances local contrast to make faint/small text pop out from background colors
     clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
     enhanced = clahe.apply(img_gray)
     
@@ -35,14 +48,5 @@ def preprocess_image_generalized(image: Image.Image) -> np.ndarray:
 def extract_text_from_image(image: Image.Image) -> list[str]:
     reader = load_ocr_reader()
     processed_img = preprocess_image_generalized(image)
-    
-    # Tuned detection parameters to catch small fine-print text without dropping bounding boxes
-    results = reader.readtext(
-        processed_img, 
-        detail=0, 
-        paragraph=False,
-        low_text=0.3,       # Detects faint text
-        text_threshold=0.4  # Prevents dropping low-confidence characters
-    )
-    
-    return [line.strip() for line in results if line.strip()]
+    results = reader.readtext(processed_img, detail=0)
+    return results

@@ -10,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Light mode UI styling
+# Light mode UI styling + Bold Button Text CSS
 st.markdown("""
     <style>
     .stApp {
@@ -22,11 +22,15 @@ st.markdown("""
         color: white;
         border-radius: 6px;
     }
+    /* Force form submit button text to render bold */
+    div[data-testid="stFormSubmitButton"] button p {
+        font-weight: bold !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("🍷 LabelCheck AI")
-st.caption("AI-Powered Alcohol Label Verification App")
+st.caption("**AI-Powered Alcohol Label Verification App**")
 
 st.markdown("---")
 
@@ -73,15 +77,16 @@ with col1:
             label_visibility="collapsed"
         )
         
-        submit_btn = st.form_submit_button("Verify Label", type="primary", width="stretch")
+        submit_btn = st.form_submit_button("Verify Label", type="primary", use_container_width=True)
 
     if uploaded_file is not None:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Label", width="stretch")
+        st.markdown("**Uploaded Label**")
+        st.image(image, use_container_width=True)
 
 with col2:
     st.subheader("Verification Results")
-    st.caption("Results will be displayed here after submission.")
+    st.caption("**Results will be displayed here after submission.**")
     
     # Validation logic executed upon clicking submission
     if submit_btn:
